@@ -27,6 +27,36 @@ class ReposTableViewController: UITableViewController {
 
     // MARK: - Table view data source
 
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        let selectedRepo = store.repositories[indexPath.row]
+        
+        store.toggleStarStatusForRepository(selectedRepo) { (toggled) in
+            
+            let alert = UIAlertController(title: "", message: "", preferredStyle: .Alert)
+            let dismissAction = UIAlertAction(title: "Okay", style: .Cancel, handler: { (cancelAction) in
+                print("Okay clicked.")
+            })
+            alert.addAction(dismissAction)
+            
+            if toggled {
+                alert.title = "You just starred \(selectedRepo.fullName)"
+                alert.accessibilityLabel = "You just starred \(selectedRepo.fullName)"
+
+            }
+            else { // untoggled
+                alert.title = "You just unstarred \(selectedRepo.fullName)"
+                alert.accessibilityLabel = "You just unstarred \(selectedRepo.fullName)"
+            }
+            
+            NSOperationQueue.mainQueue().addOperationWithBlock({
+                self.presentViewController(alert, animated: true, completion: {
+                    tableView.deselectRowAtIndexPath(indexPath, animated: true)
+                })
+            })
+        }
+    }
+    
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.store.repositories.count
     }
